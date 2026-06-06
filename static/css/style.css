@@ -1,0 +1,92 @@
+/* =============================================
+   TIKETKU — CUSTOM STYLE
+   Hanya override kecil — warna utama merah Bootstrap
+   ============================================= */
+
+:root {
+  --bs-primary: #dc3545;
+  --bs-primary-rgb: 220, 53, 69;
+}
+
+body {
+  background-color: #f8f9fa;
+}
+
+/* ---------- KURSI ---------- */
+.seat {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px 6px 3px 3px;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1.5px solid #dee2e6;
+  transition: transform 0.1s;
+}
+
+.seat.available {
+  background: #fff;
+  color: #6c757d;
+}
+
+.seat.available:hover {
+  background: #f8d7da;
+  border-color: #dc3545;
+  transform: scale(1.1);
+}
+
+.seat.taken {
+  background: #e9ecef;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.seat.selected {
+  background: #dc3545;
+  border-color: #b02a37;
+  color: #fff;
+}
+
+.seat-aisle {
+  width: 20px;
+  display: inline-block;
+}
+
+.screen-bar {
+  background: #dee2e6;
+  color: #6c757d;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  padding: 4px 0;
+  text-align: center;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+/* ---------- TIKET CETAK ---------- */
+@media print {
+  body > *:not(#print-area) {
+    display: none !important;
+  }
+  #print-area {
+    display: block !important;
+  }
+}
+
+#print-area {
+  display: none;
+  font-family: sans-serif;
+  padding: 32px;
+}
+
+.print-ticket {
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  margin: 0 auto;
+}

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MetaTiket — Penjualan Tiket Online</title>
+
+  <!-- Bootstrap 5 CSS (lokal) -->
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" />
+  <!-- Bootstrap Icons (CDN — karena file .css tidak tersedia lokal) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Custom Style (lokal) -->
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-dark bg-danger">
+  <div class="container">
+    <a class="navbar-brand fw-bold fs-4" href="#">
+      <i class="bi bi-ticket-perforated-fill me-2"></i>MetaTiket
+    </a>
+    <div class="d-flex align-items-center gap-3"><span class="text-white-50 small">Sistem Penjualan Tiket Online</span><a href="/admin" class="btn btn-outline-light btn-sm"><i class="bi bi-shield-lock-fill me-1"></i>Admin</a></div>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<div class="bg-danger text-white text-center py-4">
+  <h1 class="fw-bold mb-1">Pesan Tiket Sekarang</h1>
+  <p class="mb-0 opacity-75">Bioskop, Konser, atau Bus — mudah dan cepat</p>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="container py-4">
+
+  <!-- TAB -->
+  <ul class="nav nav-tabs nav-fill mb-4" id="mainTab" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#tab-bioskop" type="button">
+        <i class="bi bi-camera-video-fill me-1"></i> Bioskop
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#tab-konser" type="button">
+        <i class="bi bi-music-note-beamed me-1"></i> Konser
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#tab-bus" type="button">
+        <i class="bi bi-bus-front-fill me-1"></i> Bus
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#tab-riwayat" type="button" id="tab-riwayat-btn">
+        <i class="bi bi-clock-history me-1"></i> Riwayat
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+
+    <!-- ============================== -->
+    <!-- TAB BIOSKOP                    -->
+    <!-- ============================== -->
+    <div class="tab-pane fade show active" id="tab-bioskop">
+      <div class="row g-3">
+
+        <!-- Pilih Film -->
+        <div class="col-md-6">
+          <div class="card h-100 shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-film me-1"></i> 1. Pilih Film
+            </div>
+            <div class="card-body" id="list-film"></div>
+          </div>
+        </div>
+
+        <!-- Pilih Jam -->
+        <div class="col-md-6">
+          <div class="card h-100 shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-clock me-1"></i> 2. Pilih Jam Tayang
+            </div>
+            <div class="card-body">
+              <div id="list-jam-bioskop" class="d-flex flex-wrap gap-2">
+                <span class="text-muted small">Pilih film terlebih dahulu</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pilih Kursi -->
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-grid-3x3 me-1"></i> 3. Pilih Kursi
+            </div>
+            <div class="card-body">
+              <!-- Legenda -->
+              <div class="d-flex gap-3 mb-3 small text-muted">
+                <span><span class="seat available me-1" style="cursor:default;width:18px;height:18px;"></span> Tersedia</span>
+                <span><span class="seat taken me-1"    style="cursor:default;width:18px;height:18px;"></span> Terisi</span>
+                <span><span class="seat selected me-1" style="cursor:default;width:18px;height:18px;"></span> Dipilih</span>
+              </div>
+              <div class="screen-bar">— LAYAR —</div>
+              <div id="grid-kursi-bioskop"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Pemesan + Summary -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-person-fill me-1"></i> 4. Data Pemesan
+            </div>
+            <div class="card-body">
+              <label class="form-label fw-semibold">Nama Lengkap</label>
+              <input type="text" id="nama-bioskop" class="form-control" placeholder="Masukkan nama Anda" />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-secondary text-white fw-semibold">
+              <i class="bi bi-receipt me-1"></i> Ringkasan Harga
+            </div>
+            <div class="card-body" id="summary-bioskop">
+              <p class="text-muted small">Pilih kursi untuk melihat harga</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-danger btn-lg w-100 fw-bold" id="btn-bioskop">
+            <i class="bi bi-cart-check-fill me-2"></i>Pesan Tiket Bioskop
+          </button>
+        </div>
+      </div>
+    </div><!-- /tab-bioskop -->
+
+
+    <!-- ============================== -->
+    <!-- TAB KONSER                     -->
+    <!-- ============================== -->
+    <div class="tab-pane fade" id="tab-konser">
+      <div class="row g-3">
+
+        <!-- Pilih Acara -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-mic-fill me-1"></i> 1. Pilih Acara
+            </div>
+            <div class="card-body" id="list-acara"></div>
+          </div>
+        </div>
+
+        <!-- Pilih Kategori -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-tags-fill me-1"></i> 2. Pilih Kategori Kursi
+            </div>
+            <div class="card-body" id="list-kategori"></div>
+          </div>
+        </div>
+
+        <!-- Jumlah + Nama -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-person-fill me-1"></i> 3. Jumlah &amp; Data Pemesan
+            </div>
+            <div class="card-body">
+              <label class="form-label fw-semibold">Jumlah Tiket</label>
+              <div class="input-group mb-3" style="width:150px;">
+                <button class="btn btn-outline-danger" id="konser-minus" type="button">−</button>
+                <input type="text" class="form-control text-center fw-bold" id="konser-qty" value="1" readonly />
+                <button class="btn btn-outline-danger" id="konser-plus" type="button">+</button>
+              </div>
+              <label class="form-label fw-semibold">Nama Lengkap</label>
+              <input type="text" id="nama-konser" class="form-control" placeholder="Masukkan nama Anda" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="col-md-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-secondary text-white fw-semibold">
+              <i class="bi bi-receipt me-1"></i> Ringkasan Harga
+            </div>
+            <div class="card-body" id="summary-konser">
+              <p class="text-muted small">Pilih kategori untuk melihat harga</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-danger btn-lg w-100 fw-bold" id="btn-konser">
+            <i class="bi bi-cart-check-fill me-2"></i>Pesan Tiket Konser
+          </button>
+        </div>
+      </div>
+    </div><!-- /tab-konser -->
+
+
+    <!-- ============================== -->
+    <!-- TAB BUS                        -->
+    <!-- ============================== -->
+    <div class="tab-pane fade" id="tab-bus">
+      <div class="row g-3">
+
+        <!-- Pilih Rute -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-signpost-2-fill me-1"></i> 1. Pilih Rute
+            </div>
+            <div class="card-body" id="list-rute"></div>
+          </div>
+        </div>
+
+        <!-- Tanggal & Jam -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-calendar-event me-1"></i> 2. Tanggal &amp; Jam
+            </div>
+            <div class="card-body">
+              <label class="form-label fw-semibold">Tanggal Berangkat</label>
+              <input type="date" id="tanggal-bus" class="form-control mb-3" />
+              <label class="form-label fw-semibold">Jam Keberangkatan</label>
+              <div id="list-jam-bus" class="d-flex flex-wrap gap-2">
+                <span class="text-muted small">Pilih rute terlebih dahulu</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pilih Kursi Bus -->
+        <div class="col-12">
+          <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-grid me-1"></i> 3. Pilih Kursi Bus
+            </div>
+            <div class="card-body">
+              <div class="d-flex gap-3 mb-3 small text-muted">
+                <span><span class="seat available me-1" style="cursor:default;width:18px;height:18px;"></span> Tersedia</span>
+                <span><span class="seat taken me-1"    style="cursor:default;width:18px;height:18px;"></span> Terisi</span>
+                <span><span class="seat selected me-1" style="cursor:default;width:18px;height:18px;"></span> Dipilih</span>
+              </div>
+              <div id="grid-kursi-bus"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nama + Summary -->
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white fw-semibold">
+              <i class="bi bi-person-fill me-1"></i> 4. Data Penumpang
+            </div>
+            <div class="card-body">
+              <label class="form-label fw-semibold">Nama Lengkap</label>
+              <input type="text" id="nama-bus" class="form-control" placeholder="Masukkan nama Anda" />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-header bg-secondary text-white fw-semibold">
+              <i class="bi bi-receipt me-1"></i> Ringkasan Harga
+            </div>
+            <div class="card-body" id="summary-bus">
+              <p class="text-muted small">Pilih kursi untuk melihat harga</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-danger btn-lg w-100 fw-bold" id="btn-bus">
+            <i class="bi bi-cart-check-fill me-2"></i>Pesan Tiket Bus
+          </button>
+        </div>
+      </div>
+    </div><!-- /tab-bus -->
+
+      <!-- ============================== -->
+    <!-- TAB RIWAYAT                    -->
+    <!-- ============================== -->
+    <div class="tab-pane fade" id="tab-riwayat">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white fw-semibold d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-clock-history me-1"></i> Riwayat Tiket Saya</span>
+          <button class="btn btn-outline-light btn-sm" onclick="loadRiwayat()">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+          </button>
+        </div>
+        <div class="card-body" id="list-riwayat">
+          <p class="text-muted small text-center py-3">Memuat riwayat...</p>
+        </div>
+      </div>
+    </div><!-- /tab-riwayat -->
+
+</div><!-- /tab-content -->
+</div><!-- /container -->
+
+
+<!-- ===== MODAL TIKET BERHASIL ===== -->
+<div class="modal fade" id="modalTiket" tabindex="-1" aria-labelledby="modalTiketLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title fw-bold" id="modalTiketLabel">
+          <i class="bi bi-check-circle-fill me-2"></i>Tiket Berhasil Dipesan!
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modal-body-tiket"></div>
+      <div class="modal-footer">
+        <button class="btn btn-danger fw-semibold" onclick="cetakTiket()">
+          <i class="bi bi-printer-fill me-1"></i> Cetak Tiket
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Area Cetak -->
+<div id="print-area"></div>
+
+<!-- Bootstrap 5 JS Bundle (lokal) -->
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<!-- App JS (lokal) -->
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>

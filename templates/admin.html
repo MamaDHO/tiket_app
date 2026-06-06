@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MetaTiket — Admin Dashboard</title>
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/admin">
+      <i class="bi bi-shield-lock-fill me-2"></i>MetaTiket Admin
+    </a>
+    <a href="/" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Kembali ke Toko
+    </a>
+  </div>
+</nav>
+
+<div class="container py-4">
+
+  <!-- STATS -->
+  <div class="row g-3 mb-4" id="stats-row">
+    <div class="col-md-3">
+      <div class="card text-white bg-danger shadow-sm">
+        <div class="card-body">
+          <div class="small opacity-75">Total Tiket Terjual</div>
+          <div class="fs-3 fw-bold" id="stat-total">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-dark shadow-sm">
+        <div class="card-body">
+          <div class="small opacity-75">Total Pendapatan</div>
+          <div class="fs-3 fw-bold" id="stat-pendapatan">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-secondary shadow-sm">
+        <div class="card-body">
+          <div class="small opacity-75">Tiket Bioskop</div>
+          <div class="fs-3 fw-bold" id="stat-bioskop">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-secondary shadow-sm">
+        <div class="card-body">
+          <div class="small opacity-75">Tiket Bus / Konser</div>
+          <div class="fs-3 fw-bold" id="stat-lain">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABEL TIKET -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-table me-1"></i> Semua Tiket Terjual</span>
+      <div class="d-flex gap-2">
+        <input type="text" id="search-tiket" class="form-control form-control-sm" placeholder="Cari nama / kode..." style="width:200px;" />
+        <button class="btn btn-danger btn-sm fw-semibold" id="btn-reset" onclick="konfirmasiReset()">
+          <i class="bi bi-trash3-fill me-1"></i>Reset Semua
+        </button>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-sm mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Kode</th>
+              <th>Jenis</th>
+              <th>Nama</th>
+              <th>Detail</th>
+              <th>Kursi</th>
+              <th>Jumlah</th>
+              <th class="text-end">Total</th>
+              <th>Waktu</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tabel-tiket">
+            <tr><td colspan="9" class="text-center text-muted py-4">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal Konfirmasi Reset -->
+<div class="modal fade" id="modalReset" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Konfirmasi Reset</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Semua data tiket dan status kursi akan <strong>dihapus permanen</strong>. Tindakan ini tidak dapat dibatalkan.
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger fw-semibold" onclick="resetSemua()">Ya, Reset Semua</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script>
+  let semuaTiket = [];
+
+  function rupiah(n) { return "Rp " + n.toLocaleString("id-ID"); }
+
+  function badgeJenis(j) {
+    const map = { Bioskop: "danger", Konser: "warning text-dark", Bus: "primary" };
+    return `<span class="badge bg-${map[j] || 'secondary'}">${j}</span>`;
+  }
+
+  async function loadTiket() {
+    const res  = await fetch("/api/admin/tiket");
+    semuaTiket = await res.json();
+    renderTabel(semuaTiket);
+    renderStats(semuaTiket);
+  }
+
+  function renderStats(tiket) {
+    const total      = tiket.length;
+    const pendapatan = tiket.reduce((s, t) => s + t.total, 0);
+    const bioskop    = tiket.filter(t => t.jenis === "Bioskop").length;
+    const lain       = tiket.filter(t => t.jenis !== "Bioskop").length;
+    document.getElementById("stat-total").textContent      = total;
+    document.getElementById("stat-pendapatan").textContent = rupiah(pendapatan);
+    document.getElementById("stat-bioskop").textContent    = bioskop;
+    document.getElementById("stat-lain").textContent       = lain;
+  }
+
+  function renderTabel(tiket) {
+    const tbody = document.getElementById("tabel-tiket");
+    if (!tiket.length) {
+      tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted py-4">Belum ada tiket.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = tiket.map(t => `
+      <tr id="row-${t.kode}">
+        <td><span class="font-monospace fw-bold text-danger small">${t.kode}</span></td>
+        <td>${badgeJenis(t.jenis)}</td>
+        <td>${t.nama}</td>
+        <td class="small">${t.detail}${t.jam ? ' · ' + t.jam : ''}${t.kategori ? ' · ' + t.kategori : ''}</td>
+        <td class="small">${t.kursi}</td>
+        <td>${t.jumlah}</td>
+        <td class="text-end fw-semibold text-danger">${rupiah(t.total)}</td>
+        <td class="small text-muted">${t.waktu}</td>
+        <td>
+          <button class="btn btn-outline-danger btn-sm" onclick="batalkan('${t.kode}')">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </td>
+      </tr>`).join("");
+  }
+
+  async function batalkan(kode) {
+    if (!confirm(`Batalkan tiket ${kode}? Kursi akan dikembalikan.`)) return;
+    const res  = await fetch(`/api/admin/batalkan/${kode}`, { method: "POST" });
+    const data = await res.json();
+    if (data.sukses) {
+      document.getElementById(`row-${kode}`)?.remove();
+      semuaTiket = semuaTiket.filter(t => t.kode !== kode);
+      renderStats(semuaTiket);
+    } else {
+      alert("Gagal: " + data.pesan);
+    }
+  }
+
+  function konfirmasiReset() {
+    new bootstrap.Modal(document.getElementById("modalReset")).show();
+  }
+
+  async function resetSemua() {
+    await fetch("/api/admin/reset", { method: "POST" });
+    bootstrap.Modal.getInstance(document.getElementById("modalReset")).hide();
+    loadTiket();
+  }
+
+  document.getElementById("search-tiket").addEventListener("input", function () {
+    const q = this.value.toLowerCase();
+    const filtered = semuaTiket.filter(t =>
+      t.kode.toLowerCase().includes(q) || t.nama.toLowerCase().includes(q)
+    );
+    renderTabel(filtered);
+  });
+
+  loadTiket();
+</script>
+</body>
+</html>

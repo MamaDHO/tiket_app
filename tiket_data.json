@@ -1,0 +1,27 @@
+{
+  "bioskop_terisi": {
+    "F3|15:30": [
+      "D4",
+      "D5",
+      "D6",
+      "D7",
+      "D8"
+    ]
+  },
+  "bus_terisi": {},
+  "konser_terisi": {},
+  "tiket": [
+    {
+      "kode": "TKT-3WU5O",
+      "jenis": "Bioskop",
+      "nama": "Allain",
+      "detail": "Dune: Part Three",
+      "jam": "15:30",
+      "kursi": "D4, D5, D6, D7, D8",
+      "jumlah": 5,
+      "total": 250000,
+      "waktu": "05 Jun 2026, 14:57",
+      "_key": "F3|15:30"
+    }
+  ]
+}
